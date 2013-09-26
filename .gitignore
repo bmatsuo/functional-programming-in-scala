@@ -1,0 +1,6 @@
+# build directory
+target
+
+# intellij stuff
+.idea
+*.iml
