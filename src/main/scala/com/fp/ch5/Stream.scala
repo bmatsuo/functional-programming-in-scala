@@ -92,7 +92,7 @@ object Stream {
 
   def unfold[A, S](s: S)(f: S => Option[(A, S)]): Stream[A] =
     f(s) match {
-      case Some((a, snew)) => Stream.cons(a, unfold(s)(f))
+      case Some((a, snew)) => Stream.cons(a, unfold(snew)(f))
       case None            => Empty
     }
 }
