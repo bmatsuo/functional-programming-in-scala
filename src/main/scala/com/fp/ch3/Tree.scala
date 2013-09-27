@@ -1,4 +1,4 @@
-package com.fp.ch3.tree
+package com.fp.ch3
 
 sealed trait Tree[+A]
 case class Leaf[A](value: A) extends Tree[A]
@@ -69,19 +69,3 @@ object Tree {
       a => Leaf(f(a)),
       (left, right) => Branch(left, right))
 }
-
-sealed trait T[+A] {
-  def map[B](f: A => B): T[B] =
-    this match {
-      case Nil => Nil
-      case Node(value, left, right) => Node(f(value), left.map(f), right.map(f))
-    }
-
-  def fold[B](z: B)(f: (A, B, B) => B): B =
-    this match {
-      case Nil => z
-      case Node(value, left, right) => f(value, left.fold(z)(f), right.fold(z)(f))
-    }
-}
-case class Node[+A](value: A, left: T[A], right: T[A]) extends T[A]
-case object Nil extends T[Nothing]
