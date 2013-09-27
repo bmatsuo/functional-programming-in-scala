@@ -18,4 +18,26 @@ class Ch2 extends FunSuite with Matchers {
     isSortedList[Int](List(1, 2, 3, 4), _ > _) should be (true)
     isSortedList[Int](List(1, 3, 2, 4), _ > _) should be (false)
   }
+
+  test("2.3: curry") {
+    val f = curry[Int, Int, Int]((a, b) => a + b)
+    f(1)(2) should be (3)
+  }
+
+  test("2.4: uncurry") {
+    val f = uncurry[Int, Int, Int](curry((a, b) => a + b))
+    f(1, 2) should be (3)
+  }
+
+  test("2.5: compose") {
+    import scala.collection.immutable.StringOps
+
+    val f = compose[Int, String, Int](
+      _.toInt,
+      compose[Int, String, String](
+        new StringOps(_).reverse,
+        i => s"$i"))
+
+    f(123) should be (321)
+  }
 }
