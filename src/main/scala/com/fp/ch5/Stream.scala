@@ -4,10 +4,7 @@ sealed abstract class Stream[+A] {
   def foldRight[B](z: => B)(f: (A, => B) => B): B
 
   def uncons: Option[Cons[A]] =
-    foldRight[Option[Cons[A]]](None)((a, _c) => _c match {
-      case Some(c) => Some(Stream.mkCons(a, c))
-      case None    => Some(Stream.mkCons(a, Empty)) // i think this is a bullshit case. it should not execute
-    })
+    foldRight[Option[Cons[A]]](None)((a, c) => Some(Stream.mkCons(a, c getOrElse Empty)))
 
   def isEmpty: Boolean = uncons.isEmpty
 
