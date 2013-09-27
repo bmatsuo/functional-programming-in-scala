@@ -22,20 +22,19 @@ package object ch2 {
   def isSorted[A](as: Array[A], gt: (A, A) => Boolean): Boolean = {
     if (as.length < 2)
       true
-    else if (!gt(as(0), as(1)))
+    else if (gt(as(0), as(1)))
       false
     else
-      isSorted(as.slice(2, as.length), gt)
+      isSorted(as.slice(1, as.length), gt)
   }
 
   // Exercise 2: with case classes
   @tailrec
   def isSortedList[A](as: List[A], gt: (A, A) => Boolean): Boolean =
     as match {
-      case Nil => true
-      case x :: Nil => true
-      case x :: y :: rest if gt(x, y) => isSortedList(rest, gt)
-      case _ => false
+      case x :: y :: rest if gt(x, y) => false
+      case x :: y :: rest             => isSortedList(y :: rest, gt)
+      case _                          => true
     }
 
   // Exercise 3
