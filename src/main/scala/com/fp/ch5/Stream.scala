@@ -28,6 +28,14 @@ sealed abstract class Stream[+A] {
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => b && p(a))
 
+  def skip(n: Int): Stream[A] =
+    uncons match {
+      case Some(c) if n > 0 => c.tail.skip(n-1)
+      case Some(c)          => c
+      case _                => Empty
+    }
+
+
   def takeWhile(f: A => Boolean): Stream[A] =
     foldRight[Stream[A]](Empty)((a, as) =>
       if (f(a)) Stream.cons(a, as)
