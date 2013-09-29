@@ -1,5 +1,7 @@
 package com.fp.ch5
 
+import scala.annotation.tailrec
+
 sealed abstract class Stream[+A] {
   def foldRight[B](z: => B)(f: (A, => B) => B): B
 
@@ -29,9 +31,10 @@ sealed abstract class Stream[+A] {
   def forAll(p: A => Boolean): Boolean =
     foldRight(true)((a, b) => b && p(a))
 
-  def skip(n: Int): Stream[A] =
+  @tailrec
+  final def drop(n: Int): Stream[A] =
     uncons match {
-      case Some(c) if n > 0 => c.tail.skip(n-1)
+      case Some(c) if n > 0 => c.tail.drop(n-1)
       case Some(c)          => c
       case _                => Empty
     }
