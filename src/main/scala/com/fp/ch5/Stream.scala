@@ -12,8 +12,9 @@ sealed abstract class Stream[+A] {
 
   def take(n: Int): Stream[A] =
     uncons match {
-      case Some(c) if n > 0 => Stream.cons(c.head, c.tail.take(n-1))
-      case _                 => Empty
+      case Some(c)
+        if n > 0 => Stream.cons(c.head, c.tail.take(n-1))
+      case _     => Empty
     }
 
   def takeWhileNaive(f: A => Boolean): Stream[A] =
@@ -72,7 +73,7 @@ object Stream {
 
   def cons[A](h: => A, t: => Stream[A]): Stream[A] = mkCons(h, t)
 
-  private def mkCons[A](h: => A, t: => Stream[A]): Cons[A] = new Cons[A] {
+  def mkCons[A](h: => A, t: => Stream[A]): Cons[A] = new Cons[A] {
     lazy val head = h
     lazy val tail = t
   }
