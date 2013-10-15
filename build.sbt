@@ -8,8 +8,10 @@ version := "1.0"
 
 scalaVersion := "2.10.2"
 
+libraryDependencies += "org.scalaz" %% "scalaz-core" % "7.0.4"
+
 libraryDependencies += "org.scalatest" %% "scalatest" % "2.0.RC1-SNAP4" % "test"
 
 initialCommands in console := """println("Functional Programming in Scala!");import com.fp._;"""
 
-testOptions in Test += Tests.Argument("-oD")
+testOptions in Test += Tests.Argument("-oDF")
