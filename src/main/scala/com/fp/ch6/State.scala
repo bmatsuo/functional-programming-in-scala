@@ -4,9 +4,9 @@ case class State[S, +A](action: S => (A, S)) {
   def apply(s: S): (A, S) = action(s)
 
   def flatMap[B](f: A => State[S, B]): State[S, B] =
-    State(s1 => {
-      val (a, s2) = action(s1)
-      f(a).action(s2)
+    State[S,B](s1 => {
+      val (a, s2) = apply(s1)
+      f(a)(s2)
     })
 
   def map[B](f: A => B): State[S, B] =

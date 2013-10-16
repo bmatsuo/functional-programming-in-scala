@@ -7,6 +7,7 @@ class Ch6 extends FunSuite with Matchers {
   import RNG._
 
   test("x.x: simple algorithm check") {
+    pending
     def sample(n: Int, seed: Long): Stream[Int] = Stream
       .unfold(simple(seed))(r => Some(r.nextInt))
       .take(n)
@@ -15,6 +16,7 @@ class Ch6 extends FunSuite with Matchers {
   }
 
   test("6.1: postiveInt") {
+    pending
     def sample(n: Int, seed: Long): Stream[Int] = Stream
       .unfold(simple(seed))(r => Some(r.positiveInt))
       .take(n)
@@ -24,6 +26,7 @@ class Ch6 extends FunSuite with Matchers {
   }
 
   test("6.2: double") {
+    pending
     def sample(n: Int, seed: Long): Stream[Double] = Stream
       .unfold(simple(seed))(r => Some(r.double))
       .take(n)
@@ -32,6 +35,7 @@ class Ch6 extends FunSuite with Matchers {
   }
 
   test("6.8: flatMap and postiveLessThan") {
+    pending
     def sample(n: Int, lessThan: Int, seed: Long): Stream[Int] = Stream
       .unfold(simple(seed))(r => Some(RNG.positiveLessThan(lessThan)(r)))
       .take(n)
@@ -41,6 +45,7 @@ class Ch6 extends FunSuite with Matchers {
   }
 
   test("x.x: reproducible errors") {
+    pending
     rollDie(simple(5)) should be (0, _: RNG)
   }
 
@@ -80,6 +85,9 @@ class Ch6 extends FunSuite with Matchers {
   }
 
   test("6.11: simulate") {
+    {
+      pending
+    }
     {
       val m1 = Machine(true, 5, 10)
       val inputs = List(

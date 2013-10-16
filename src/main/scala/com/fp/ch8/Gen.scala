@@ -24,6 +24,8 @@ case class Gen[A](sample: RNG.Rand[A]) {
   def filter(f: A => Boolean): Gen[A] =
     flatMap(a => f(a) ? unit(a) | filter(f))
 
+  def toSGen: SGen[A] = SGen(_ => this)
+
   def take(n: Int): Gen[List[A]] =
     sequence(Stream
       .continually(this)
@@ -46,6 +48,9 @@ object Gen {
 
   def string(n: Int, alpha: String): Gen[String] =
     char(alpha) take n map (_.mkString)
+
+  def stream[A](a: Gen[A])(rng: RNG): Stream[A] =
+    Stream.iterate[(A, RNG)](a sample rng)(x => a.sample(x._2)).unzip._1
 
   def positiveLessThan(n: Int): Gen[Int] =
     int.flatMap({
@@ -80,7 +85,7 @@ object Gen {
     g take n
 
   def pair[A, B](a: Gen[A], b: Gen[B]): Gen[(A, B)] =
-    (a map2 b)(Tuple2)
+    (a map2 b)((_, _))
 
   def triple[A, B, C](a: Gen[A], b: Gen[B], c: Gen[C]): Gen[(A, B, C)] =
     for {
@@ -90,7 +95,7 @@ object Gen {
     } yield (a, b, c)
 
   def filterOption[A](a: Gen[Option[A]]): Gen[A] =
-    a flatMap { _ map unit getOrElse filterOption(a) }
+    a flatMap { _.map(unit(_)).getOrElse(filterOption(a)) }
 
   def option[A](a: Gen[A])(select: A => Boolean): Gen[Option[A]] =
     a map { a => select(a).option(a) }
@@ -102,6 +107,7 @@ object Gen {
   def pattern(s: Gen[String]*): Gen[String] =
     sequence(s.toList) map (_.mkString)
 
+  /*
   implicit class EnrichedStringGen(s: Gen[String]) {
     //    string(20, "0123456789abcdef") ~ ": " ~ choose(List("String", "Int", "Double"))
     def ~(that: EnrichedStringGen): EnrichedStringGen =
@@ -113,6 +119,7 @@ object Gen {
     new EnrichedStringGen(unit(s))
 
   def $: EnrichedStringGen = enrichString("")
+  */
 
   def union[A](a1: Gen[A], a2: Gen[A]): Gen[A] =
     choose(List(a1, a2)) flatMap identity

@@ -2,7 +2,6 @@ package com.fp.ch6
 
 import com.fp.ch5._
 
-
 trait RNG {
   def nextInt: (Int, RNG)
 
@@ -88,6 +87,9 @@ object RNG {
     flatMap(double)(x1 =>
       flatMap(double)(x2 =>
         map(double)(x3 => (x1, x2, x3))))
+
+  def stream[A](r: Rand[A])(rng: RNG): Stream[A] =
+    Stream.unfold[A, RNG](rng)(rng => Some(r(rng)))
 
   def sequence[A](ras: List[Rand[A]]): Rand[List[A]] =
     State.sequence(ras)
