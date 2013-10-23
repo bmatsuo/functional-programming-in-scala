@@ -70,10 +70,10 @@ object Prop {
         .zip(Stream.from(0))
         .take(n)
 
-      cases.foldRight[Result](None)({
-        case ((a, i), None) =>
+      cases.foldLeft[Result](None)({
+        case (None, (a, i)) =>
           try {
-            f(a).option(s"failed case: $a", i)
+            f(a) ? (None: Result) | Some(s"failed case: $a", i)
           } catch {
             case e: Exception =>
               val msg =
@@ -82,7 +82,7 @@ object Prop {
                   s"stack trace\n\t${e.getStackTrace.mkString("\n\t")}\n"
               Some(msg, i)
           }
-        case (_, some) => some
+        case (some, _) => some
       })
     })
 
@@ -138,6 +138,9 @@ object SProp {
     }
   }
 
+  def check(p: => Boolean): SProp =
+    forAll(Gen.unit(Unit))(_ => p)
+
   def forAll[A](as: Gen[A])(f: A => Boolean): SProp =
     SProp({ (_, n, rng) =>
       val cases = Gen
@@ -148,7 +151,7 @@ object SProp {
       cases.foldRight[Result](None)({
         case ((a, i), None) =>
           try {
-            f(a).option(s"failed case: $a", i)
+            f(a) ? (None: Result) | Some(s"failed case: $a", i)
           } catch {
             case e: Exception =>
               val msg =

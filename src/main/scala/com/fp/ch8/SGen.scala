@@ -27,4 +27,7 @@ object SGen {
 
   def listOf[A](a: Gen[A]): SGen[List[A]] =
     SGen(n => Gen.listOfN(n, a))
+
+  def listOf1[A](a: Gen[A]): SGen[List[A]] =
+    SGen(n => Gen.listOfN(n + 1, a))
 }

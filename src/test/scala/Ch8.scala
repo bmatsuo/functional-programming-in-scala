@@ -1,5 +1,9 @@
+import com.fp.ch7.Par
+import com.fp.ch7.Par.Par
+import java.util.concurrent.{Executors, ExecutorService}
 import org.scalatest.FunSuite
 import org.scalatest.Matchers
+import com.fp.ch7._
 import com.fp.ch8._
 
 import scalaz._
@@ -15,29 +19,43 @@ class Ch8 extends FunSuite with Matchers {
     (fail && fail).check should be (false)
   }
 
+  def smallInts = Gen.choose(-10, 10)
+
+  test("?.? prop") {
+    import Prop.EnrichedString
+
+    Prop.run("unit is constant" := Prop.forAll(Gen.unit(1))(1 ==))
+  }
+
   test("?.? max") {
-    val smallInts = Gen.choose(-10, 10)
-    val smallNonNegative = Gen.choose(0, 10)
+    import SProp.EnrichedString
 
-    Prop.forAll(Gen.unit(1))(1 ==)
-    Prop.forAll(smallInts)(_.abs < 11)
-    SProp.forAll(Gen.string(_, "123"))(s => "[123]*".r.unapplySeq(s) ? true | false)
-    SProp.forAll(Gen.listOfN(_, smallNonNegative)) { xs =>
+    SProp.run("no elements greater" := SProp.forAll(SGen.listOf1(smallInts)) { xs =>
       val max = xs.max
-      !xs.exists(_ > max)
-    }
-    /*
-    val fixedNoneGreater = Prop.forAll(Gen.listOfN(5, smallInts)) { xs =>
-      val max = xs.max
-      !xs.exists(_ > max)
-    }
-    Prop.run(fixedNoneGreater)
+      !xs.exists(max <)
+    }) should be (None)
+  }
 
-    val noneGreater = SProp.forAll(SGen.listOf(smallInts)) { xs =>
-      val max = xs.max
-      !xs.exists(_ > max)
-    }
-    SProp.run(noneGreater)
-    */
+  test("?.? sorted") {
+    import SProp.EnrichedString
+
+    SProp.run("independence of initial order" := SProp.forAll(SGen.listOf1(smallInts)) { xs =>
+      xs.sorted == xs.reverse.sorted
+    }) should be (None)
+  }
+
+  test("?.? par unit") {
+
+    SProp.run(SProp.check {
+      val es: ExecutorService = Executors.newCachedThreadPool
+
+      def equal[A](a1: Par[A], a2: Par[A]): Par[Boolean] =
+        Par.map2(a1, a2)(_ == _)
+
+      val p = Par.map(Par.unit(1))(_ + 1)
+      val p2 = Par.unit(2)
+
+      equal(p, p2) (es) get
+    }) should be (None)
   }
 }

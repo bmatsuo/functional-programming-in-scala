@@ -50,7 +50,7 @@ object Gen {
     char(alpha) take n map (_.mkString)
 
   def stream[A](a: Gen[A])(rng: RNG): Stream[A] =
-    Stream.iterate[(A, RNG)](a sample rng)(x => a.sample(x._2)).unzip._1
+    Stream.iterate[(A, RNG)](a sample rng)(x => a.sample(x._2)).map(_._1)
 
   def positiveLessThan(n: Int): Gen[Int] =
     int.flatMap({
